@@ -10,13 +10,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
 
 // Person data struct
 type Person struct {
-	ID        string   `json:"id,omitempty"`
+	ID        int      `json:"id,omitempty"`
 	Firstname string   `json:"firstname,omitempty"`
 	Lastname  string   `json:"lastname,omitempty"`
 	Address   *Address `json:"address,omitempty"`
@@ -39,7 +40,8 @@ func GetPeople(w http.ResponseWriter, r *http.Request) {
 func GetPerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for _, item := range people {
-		if item.ID == params["id"] {
+		idIntVal, _ := strconv.Atoi(params["id"])
+		if item.ID == idIntVal {
 			json.NewEncoder(w).Encode(item)
 			return
 		}
@@ -54,7 +56,7 @@ func PersistPeople(w http.ResponseWriter, r *http.Request) {
 
 	for _, person := range people {
 		var row []string
-		row = append(row, person.ID)
+		row = append(row, strconv.Itoa(person.ID))
 		row = append(row, person.Firstname)
 		row = append(row, person.Lastname)
 		row = append(row, person.Address.City)
@@ -90,7 +92,7 @@ func PersistPeople(w http.ResponseWriter, r *http.Request) {
 func CreatePerson(w http.ResponseWriter, r *http.Request) {
 	var newPerson Person
 	_ = json.NewDecoder(r.Body).Decode(&newPerson)
-	newPerson.ID = string(len(people) + 1)
+	newPerson.ID = len(people) + 1
 	people = append(people, newPerson)
 	json.NewEncoder(w).Encode(newPerson)
 }
@@ -99,7 +101,8 @@ func CreatePerson(w http.ResponseWriter, r *http.Request) {
 func UpdatePerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for index, item := range people {
-		if item.ID == params["ID"] {
+		idIntVal, _ := strconv.Atoi(params["id"])
+		if item.ID == idIntVal {
 			var requestBody Person
 			_ = json.NewDecoder(r.Body).Decode(&requestBody)
 
@@ -117,7 +120,8 @@ func UpdatePerson(w http.ResponseWriter, r *http.Request) {
 func DeletePerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	for index, item := range people {
-		if item.ID == params["ID"] {
+		idIntVal, _ := strconv.Atoi(params["id"])
+		if item.ID == idIntVal {
 			people = append(people[:index], people[index+1:]...)
 			break
 		}
@@ -128,15 +132,14 @@ func DeletePerson(w http.ResponseWriter, r *http.Request) {
 func main() {
 	router := mux.NewRouter()
 
-	people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
-	people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
-	log.Print("People Database is initialized - API is ready!")
-
 	router.HandleFunc("/people", GetPeople).Methods("GET")
 	router.HandleFunc("/people", CreatePerson).Methods("POST")
 	router.HandleFunc("/people/tocsv", PersistPeople).Methods("POST")
 	router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
 	router.HandleFunc("/people/{id}", UpdatePerson).Methods("PUT")
 	router.HandleFunc("/people/{id}", DeletePerson).Methods("DELETE")
+
+	log.Print("API is ready to use!")
+
 	log.Fatal(http.ListenAndServe(":8000", router))
 }
