@@ -1,9 +1,15 @@
 package main
 
+/*
+ * Example showing how convenient it is to create a REST API with 1 file
+ */
+
 import (
+	"encoding/csv"
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -39,6 +45,45 @@ func GetPerson(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	json.NewEncoder(w).Encode(&Person{})
+}
+
+// Route Handler to create a CSV and store the amount of people in the people array
+func PersistPeople(w http.ResponseWriter, r *http.Request) {
+	headerRow := []string{"id", "firstName", "lastName", "city", "state"}
+	rows := make([][]string, len(people))
+
+	for _, person := range people {
+		var row []string
+		row = append(row, person.ID)
+		row = append(row, person.Firstname)
+		row = append(row, person.Lastname)
+		row = append(row, person.Address.City)
+		row = append(row, person.Address.State)
+		rows = append(rows, row)
+	}
+
+	csvFile, err := os.Create("people.csv")
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	csvWriter := csv.NewWriter(csvFile)
+
+	csvWriter.Write(headerRow)
+	// Write any buffered data to the underlying writer (standard output).
+	csvWriter.Flush()
+
+	for _, record := range rows {
+		if err := csvWriter.Write(record); err != nil {
+			log.Fatalln("error writing record to csv:", err)
+		}
+	}
+
+	// Write any buffered data to the underlying writer (standard output).
+	csvWriter.Flush()
+	if err := csvWriter.Error(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // Route handler to create a person
@@ -89,6 +134,7 @@ func main() {
 
 	router.HandleFunc("/people", GetPeople).Methods("GET")
 	router.HandleFunc("/people", CreatePerson).Methods("POST")
+	router.HandleFunc("/people/tocsv", PersistPeople).Methods("POST")
 	router.HandleFunc("/people/{id}", GetPerson).Methods("GET")
 	router.HandleFunc("/people/{id}", UpdatePerson).Methods("PUT")
 	router.HandleFunc("/people/{id}", DeletePerson).Methods("DELETE")
