@@ -14,11 +14,11 @@ func init() {
 
 func main() {
 	sages := map[string]string{
-		"India":    "Ghandi",
-		"America":  "MLK",
-		"Medidate": "Buddha",
-		"Love":     "Jesus",
-		"Prophet":  "Muhammed",
+		"New York":      "NY",
+		"Chicago":       "IL",
+		"San Fransisco": "CA",
+		"Dallas":        "TX",
+		"Seattle":       "WA",
 	}
 
 	err := tpl.Execute(os.Stdout, sages)

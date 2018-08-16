@@ -8,9 +8,9 @@ import (
 
 var tpl *template.Template
 
-type sage struct {
-	Name  string
-	Motto string
+type city struct {
+	City  string
+	State string
 }
 
 func init() {
@@ -19,12 +19,12 @@ func init() {
 
 func main() {
 
-	buddha := sage{
-		Name:  "Buddha",
-		Motto: "The belief of no beliefs",
+	nyc := city{
+		City:  "New York",
+		State: "NY",
 	}
 
-	err := tpl.Execute(os.Stdout, buddha)
+	err := tpl.Execute(os.Stdout, nyc)
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -6,7 +6,7 @@ import (
 
 type contactInfo struct {
 	email   string
-	zipCode int16
+	zipCode int32
 }
 
 type person struct {
@@ -17,20 +17,19 @@ type person struct {
 
 func main() {
 	jim := person{
-		firstName: "Jim",
-		lastName:  "Carey",
+		firstName: "Daouda",
+		lastName:  "Sakho",
 		contactInfo: contactInfo{
-			email:   "jim.carey@gmail.com",
-			zipCode: 12345,
+			email:   "d.sakho89@gmail.com",
+			zipCode: 99999,
 		},
 	}
 
-	jim.updateName("James")
 	jim.print()
 }
 
-func (pointerToPerson *person) updateName(newFirstName string) {
-	(*pointerToPerson).firstName = newFirstName
+func (p *person) updateName(newFirstName string) {
+	(*p).firstName = newFirstName
 }
 
 func (p person) print() {

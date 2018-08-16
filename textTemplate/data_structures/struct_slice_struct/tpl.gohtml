@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Wisdom & Transport</title>
+    <title>Popular Cities & Airports</title>
 </head>
 <body>
 <ul>
-    {{range .Wisdom}}
-    <li>{{.Name}} - {{.Motto}}</li>
+    {{range .Cities}}
+    <li>{{.City}} - {{.State}}</li>
     {{end}}
 </ul>
 <ul>
-
-    {{range .Transport}}
-    <li>{{.Manufacturer}} - {{.Model}} - {{.Doors}}</li>
+    {{range .Airports}}
+    <li>{{.Name}} - {{.Terminals}}</li>
     {{end}}
 </ul>
 </body>
